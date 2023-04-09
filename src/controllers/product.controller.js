@@ -1,7 +1,5 @@
 const Model = require('../models/product.model');
-const VariantModel = require('../models/variant.model')
 const asyncMiddleware = require('../middlewares/async.middleware');
-const variantModel = require('../models/variant.model');
 
 exports.list = asyncMiddleware(async (_, res) => {
     const products = await Model.find({})
@@ -40,11 +38,11 @@ exports.listByCategory = asyncMiddleware(async (req, res) => {
 exports.createVariantGroup = asyncMiddleware(async (req, res) => {
     const productId = req.params.productId;
     const group = req.body;
-    
+
     // to avoid duplication, gonna find better solution
     const isExist = await Model.findOne({ _id: productId, 'variantGroups.name': group.name })
-    if(isExist) return res.status(400).json({message: 'ITEM_ALREADY_EXISTS'})
-    
+    if (isExist) return res.status(400).json({ message: 'ITEM_ALREADY_EXISTS' })
+
 
     const product = await Model.findByIdAndUpdate(productId, { $addToSet: { variantGroups: group } }, { new: true })
 
@@ -66,7 +64,7 @@ exports.updateVariantGroup = asyncMiddleware(async (req, res) => {
 
     // to avoid duplication, gonna find better solution
     const isExist = await Model.findOne({ _id: req.params.productId, 'variantGroups.name': data.name })
-    if(isExist) return res.status(400).json({message: 'ITEM_ALREADY_EXISTS'})
+    if (isExist) return res.status(400).json({ message: 'ITEM_ALREADY_EXISTS' })
 
     const filter = { _id: req.params.productId, "variantGroups._id": req.params.groupId }
     const payload = { $set: {} }
@@ -76,68 +74,4 @@ exports.updateVariantGroup = asyncMiddleware(async (req, res) => {
     const product = await Model.findOneAndUpdate(filter, payload, { new: true })
 
     res.status(200).json(product)
-})
-
-//variant
-//? when product does't have any variant returns response with 404
-exports.listVariants = asyncMiddleware(async (req, res) => {
-    const variants = await VariantModel.find({product: req.params.productId})
-    if(!variants.length) return res.status(404).json({message: "NOT_FOUND"})
-
-    res.status(200).json(variants)
-})
-
-exports.getVariant = asyncMiddleware(async (req, res) => {
-    const variant = await VariantModel.findById(req.params.variantId)
-    if(!variant) return res.status(404).json({message: "ITEM_NOT_FOUND"})
-
-    res.status(200).json(variant)
-})
-
-//? Creates variants with same name
-exports.createVariant = asyncMiddleware(async (req, res) => {
-    const { productId, groupId } = req.params;
-
-    const product = await Model.findOne({ _id: productId, "variantGroups._id": groupId });
-    if (!product) return res.status(404).json({ message: "ITEM_NOT_FOUND" });
-
-    const groupIndex = product.variantGroups.findIndex((group) => group._id == groupId);
-    if (groupIndex === -1) return res.status(404).json({ message: "VARIANT_GROUP_NOT_FOUND" });
-    
-    // to avoid duplication, gonna find better solution
-    const isExist = await VariantModel.findOne({name: req.body.name})
-    if (isExist) return res.status(400).json({message: "VARIANT_ALREADY_EXISTS"})
-
-    const variantPayload = { ...req.body, product: productId };
-    const variant = await VariantModel.create(variantPayload);
-
-    const newVariant = {
-        name: variant.name,
-        _id: variant._id,
-        price: variant.price,
-        stock: variant.stock,
-    };
-
-    product.variantGroups[groupIndex].variants.push(newVariant);
-    await product.save();
-
-    res.status(200).json(product)
-})
-
-exports.deleteVariant = asyncMiddleware(async (req, res) => {
-    const { productId, variantId } = req.params;
-
-    const filter = { _id: productId, "variantGroups.variants._id": variantId }
-    const payload = { $pull: { "variantGroups.$.variants": { _id: variantId } } }
-
-    const product = await Model.findOneAndUpdate(filter, payload, { new: true })
-    if (!product) return res.status(404).json({message: "PRODUCT_NOT_FOUND"}) 
-
-    const variant = await VariantModel.findByIdAndDelete(variantId)
-    if (!variant) return res.status(404).json({message: "VARIANT_NOT_FOUND"}) 
-
-    res.status(200).send({
-        product, 
-        variant
-    })
 })
