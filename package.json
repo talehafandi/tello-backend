@@ -16,10 +16,12 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "helmet": "^6.0.1",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.1.5",
     "joi": "^17.8.3",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.9.2"
+    "mongoose": "^6.9.2",
+    "nodemailer": "^6.9.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.21"
