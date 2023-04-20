@@ -11,7 +11,9 @@ module.exports = {
         client_secret: process.env.GOOGLE_SECRET,
         redirect_url: process.env.GOOGLE_REDIRECT
     },
+    mailer:{
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    },
     jwt_sign: process.env.JWT_SIGN,
-    mail_user: process.env.MAIL_USER,
-    mail_pass: process.env.MAIL_PASS
 }
