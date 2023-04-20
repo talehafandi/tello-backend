@@ -10,12 +10,12 @@ const User = new Schema({
         type: String,
         required: true,
     },
-    // address: {
-    //     country: { type: String },
-    //     city: { type: String },
-    //     street: { type: String },
-    //     zipCode: { type: String }
-    // },
+    address: {
+        country: { type: String },
+        city: { type: String },
+        street: { type: String },
+        zipCode: { type: String }
+    },
     // sex: { type: String, enum: ['m', 'f'] },
     role: { type: String, default: 'user' },
     email: {
@@ -32,9 +32,9 @@ const User = new Schema({
     },
     lastLogin:{
         type: String
-    },
-    
+    },    
     forgotPasswordCode: { type: String },
+    oAuth: { type: Boolean, default: false }
     // expiresAt: {
     //     type: Date,
     //     expires: '60',

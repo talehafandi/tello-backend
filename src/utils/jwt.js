@@ -18,4 +18,6 @@ operations.validate = function (token) {
     return jsonwebtoken.verify(token, config.jwt_sign)
 }
 
+operations.decode = (token) => jsonwebtoken.decode(token)
+
 module.exports = operations
