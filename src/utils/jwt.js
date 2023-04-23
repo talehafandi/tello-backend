@@ -11,11 +11,16 @@ operations.sign = (user) => {
         lastname: user.lastname
     }
     // console.log("claims: ", claims);
-    return jsonwebtoken.sign(JSON.stringify(claims), config.jwt_sign)
+    console.log(config.jwt.expire);
+    return jsonwebtoken.sign(
+        claims, 
+        config.jwt.sign,
+        { expiresIn: config.jwt.expire }
+    )
 }
 
-operations.validate = function (token) {
-    return jsonwebtoken.verify(token, config.jwt_sign)
+operations.verify = function (token) {
+    return jsonwebtoken.verify(token, config.jwt.sign)
 }
 
 operations.decode = (token) => jsonwebtoken.decode(token)

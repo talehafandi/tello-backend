@@ -1,4 +1,5 @@
 const jwt = require('../utils/jwt')
+const User = require('../models/user.model')
 
 const bypass = [
     '/api/v1/auth/login',
@@ -10,7 +11,7 @@ const bypass = [
     '/api/v1/auth/forgot-password/confirm',
 ]
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     console.log(req.path, bypass.includes(req.path))
     if (bypass.includes(req.path)) return next()
     
@@ -18,9 +19,13 @@ module.exports = (req, res, next) => {
     if (!token) return res.status(403).send({ message: 'Token not provided' })
 
     try {
-        req.user = jwt.validate(token)
+        req.user = jwt.verify(token)
+        const user = await User.findById(req.user.id)
+        if(!user) return res.status(404).send({ message: 'USER_NOT_FOUND' })
         next()
     } catch (e) {
-        return res.status(403).send({ message: 'INVALID_TOKEN' })
+        let message = 'INVALID_TOKEN'
+        if(e.message == 'jwt expired') message = 'TOKEN_EXPIRED'
+        return res.status(403).send({ message })
     }
 }

@@ -15,5 +15,8 @@ module.exports = {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS
     },
-    jwt_sign: process.env.JWT_SIGN,
+    jwt: {
+        sign: process.env.JWT_SIGN,
+        expire: process.env.JWT_EXPIRE
+    }
 }
