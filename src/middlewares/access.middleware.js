@@ -1,5 +1,5 @@
-const jwt = require('../utils/jwt')
-const User = require('../models/user.model')
+import jwt from'../utils/jwt.js'
+import User from'../models/user.model.js'
 
 const bypass = [
     '/api/v1/auth/login',
@@ -11,7 +11,7 @@ const bypass = [
     '/api/v1/auth/forgot-password/confirm',
 ]
 
-module.exports = async (req, res, next) => {
+export default async (req, res, next) => {
     console.log(req.path, bypass.includes(req.path))
     if (bypass.includes(req.path)) return next()
     

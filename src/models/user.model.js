@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema
 
 const User = new Schema({
@@ -35,12 +35,6 @@ const User = new Schema({
     },    
     forgotPasswordCode: { type: String },
     oAuth: { type: Boolean, default: false }
-    // expiresAt: {
-    //     type: Date,
-    //     expires: '60',
-    //     index: true,
-    //     default: Date.now,
-    // },
 })
 
-module.exports = mongoose.model('user', User);
+export default mongoose.model('user', User);

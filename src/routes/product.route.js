@@ -1,6 +1,8 @@
-const router = require('express').Router();
-const controller = require('../controllers/product.controller');
-const variantRoute = require('./variant.route')
+import { Router } from 'express'
+import controller from '../controllers/product.controller.js';
+import variantRoute from './variant.route.js'
+
+const router = Router()
 
 router.get('/', controller.list);
 router.post('/', controller.create);
@@ -18,4 +20,4 @@ router.delete('/:productId/variant-groups/:groupId', controller.deleteVariantGro
 //? ERROR
 router.use('/:productId/variants', variantRoute)
 
-module.exports = router;
+export default router

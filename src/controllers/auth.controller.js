@@ -1,13 +1,13 @@
-const User = require('../models/user.model')
-const asyncMiddleware = require('../middlewares/async.middleware')
-const bcyrpt = require('bcrypt')
-const jwt = require('../utils/jwt') 
-const mailer = require('../utils/mailer')
-const crypto = require('crypto')
-const { google } = require('googleapis')
-const config = require('../config')
+import User from'../models/user.model.js'
+import asyncMiddleware from'../middlewares/async.middleware.js'
+import bcyrpt from'bcrypt'
+import jwt from'../utils/jwt.js' 
+import mailer from'../utils/mailer.js'
+import crypto from'crypto'
+import { google } from'googleapis'
+import config from'../config.js'
 
-exports.signup = asyncMiddleware(async (req, res) => {
+const signup = asyncMiddleware(async (req, res) => {
     const { email, password } = req.body
     const exists = await User.findOne({ email: email })
     if(exists) return res.status(400).json({message: 'USER_ALREADY_EXISTS'})    
@@ -22,7 +22,7 @@ exports.signup = asyncMiddleware(async (req, res) => {
     res.status(201).json({token: jwt.sign(user)})    
 })
 
-exports.login = asyncMiddleware(async (req, res) => {
+const login = asyncMiddleware(async (req, res) => {
     const { email, password } = req.body
     
     const user = await User.findOne({ email: email })
@@ -36,7 +36,7 @@ exports.login = asyncMiddleware(async (req, res) => {
 })
 
 //? what if the same code is used for 2 different users at the same time ???
-exports.forgotPassword = asyncMiddleware(async (req, res) => {
+const forgotPassword = asyncMiddleware(async (req, res) => {
     const { email } = req.body
 
     const user = await User.findOne({email: email})
@@ -55,7 +55,7 @@ exports.forgotPassword = asyncMiddleware(async (req, res) => {
     res.status(200).json({message: "the confirmation code sent to your email!"})
 })
 
-exports.forgotPasswordConfirm = asyncMiddleware(async (req, res) => {
+const forgotPasswordConfirm = asyncMiddleware(async (req, res) => {
     const { code, newPassword } = req.body
     
     const user = await User.findOne({ forgotPasswordCode: code })
@@ -72,7 +72,7 @@ exports.forgotPasswordConfirm = asyncMiddleware(async (req, res) => {
 
 })
 
-exports.changePassword = asyncMiddleware(async (req, res) => {
+const changePassword = asyncMiddleware(async (req, res) => {
     const { oldPassword, newPassword, email } = req.body
 
     const user = await User.findOne({ email: email })
@@ -97,7 +97,7 @@ const client = new google.auth.OAuth2(
     config.google.redirect_url
 )
 
-exports.getUrl = (_, res) => {
+const getUrl = (_, res) => {
     const url = client.generateAuthUrl({
         access_type: 'offline',
         // prompt: 'consent',
@@ -107,7 +107,7 @@ exports.getUrl = (_, res) => {
     return res.status(201).json({ url })
 }
 
-exports.handleAuth = asyncMiddleware(async (req, res) => {
+const handleAuth = asyncMiddleware(async (req, res) => {
     const { tokens } = await client.getToken(req.query.code)
     if(!tokens.id_token) return res.status(501).json({message: 'GOOGLE_LOGIN_FAILED'})
 
@@ -128,3 +128,13 @@ exports.handleAuth = asyncMiddleware(async (req, res) => {
     
     return res.status(201).json({ token: jwt.sign(user) })
 })
+
+export default {
+    login,
+    signup,
+    changePassword,
+    forgotPassword,
+    forgotPasswordConfirm,
+    getUrl,
+    handleAuth
+}

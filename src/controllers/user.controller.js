@@ -1,19 +1,19 @@
-const User = require('../models/user.model')
-const asyncMiddleware = require('../middlewares/async.middleware')
+import User from '../models/user.model.js'
+import asyncMiddleware from '../middlewares/async.middleware.js'
 
-exports.list = asyncMiddleware(async(req, res) => {
-    const users = await User.find()
+const list = asyncMiddleware(async(req, res) => {
+    const users = await User.find().select('-password')
     return res.status(201).json(users)
 })
 
-exports.getOne = asyncMiddleware(async(req, res) => {
+const getOne = asyncMiddleware(async(req, res) => {
     const user = await User.findById(req.params.id)
     if(!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
 
     return res.status(201).json(user)
 })
 
-exports.update = asyncMiddleware(async (req, res) => {
+const update = asyncMiddleware(async (req, res) => {
     const payload = req.body
     const { id } = req.params
     
@@ -24,7 +24,7 @@ exports.update = asyncMiddleware(async (req, res) => {
     return res.status(201).json(user)
 })  
 
-exports.delete = asyncMiddleware(async (req, res) => {
+const remove = asyncMiddleware(async (req, res) => {
     const user = await User.findById(req.params.id)
     if(!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
     if(user._id != req.user.id) return res.status(403).json({ message: 'UNAUTHORIZED_ACTION' })
@@ -32,3 +32,10 @@ exports.delete = asyncMiddleware(async (req, res) => {
     await User.findByIdAndRemove(req.params.id)
     return res.status(201).json(user)
 })
+
+export default {
+    list,
+    getOne,
+    update,
+    remove
+}

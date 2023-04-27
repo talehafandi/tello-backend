@@ -1,41 +1,41 @@
-const Model = require('../models/product.model');
-const asyncMiddleware = require('../middlewares/async.middleware');
+import Model from '../models/product.model.js';
+import asyncMiddleware from '../middlewares/async.middleware.js';
 
-exports.list = asyncMiddleware(async (_, res) => {
+const list = asyncMiddleware(async (_, res) => {
     const products = await Model.find({})
     // .populate({ path: 'category', select: "_id name slug" });
     res.status(200).json(products);
 });
 
-exports.getItem = asyncMiddleware(async (req, res) => {
+const getItem = asyncMiddleware(async (req, res) => {
     const product = await Model.findById(req.params.id)
     if (!product) return res.status(404).json({ message: 'PRODUCT_NOT_FOUND' });
     res.status(200).json(product);
 });
 
-exports.create = asyncMiddleware(async (req, res) => {
+const create = asyncMiddleware(async (req, res) => {
     const product = await Model.create(req.body);
     res.status(201).json(product);
 });
 
-exports.update = asyncMiddleware(async (req, res) => {
+const update = asyncMiddleware(async (req, res) => {
     const updated = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updated);
 });
 
-exports.remove = asyncMiddleware(async (req, res) => {
+const remove = asyncMiddleware(async (req, res) => {
     const deleted = await Model.findByIdAndDelete(req.params.id);
     res.status(200).json(deleted);
 });
 
-exports.listByCategory = asyncMiddleware(async (req, res) => {
+const listByCategory = asyncMiddleware(async (req, res) => {
     const products = await Model.find({ categories: { $in: [req.params.categoryId] } })
     // .populate({ path: 'category', select: "_id name slug" });
     res.status(200).json(products);
 });
 
 //variant-group
-exports.createVariantGroup = asyncMiddleware(async (req, res) => {
+const createVariantGroup = asyncMiddleware(async (req, res) => {
     const productId = req.params.productId;
     const group = req.body;
 
@@ -49,7 +49,7 @@ exports.createVariantGroup = asyncMiddleware(async (req, res) => {
     res.status(200).json(product)
 });
 
-exports.deleteVariantGroup = asyncMiddleware(async (req, res) => {
+const deleteVariantGroup = asyncMiddleware(async (req, res) => {
     const product = await Model.findOneAndUpdate(
         { _id: req.params.productId },
         { $pull: { variantGroups: { _id: req.params.groupId } } },
@@ -59,7 +59,7 @@ exports.deleteVariantGroup = asyncMiddleware(async (req, res) => {
 })
 
 //? look again - might be wrong query
-exports.updateVariantGroup = asyncMiddleware(async (req, res) => {
+const updateVariantGroup = asyncMiddleware(async (req, res) => {
     const data = req.body
 
     // to avoid duplication, gonna find better solution
@@ -75,3 +75,15 @@ exports.updateVariantGroup = asyncMiddleware(async (req, res) => {
 
     res.status(200).json(product)
 })
+
+export default {
+    list,
+    getItem,
+    create,
+    update,
+    remove,
+    listByCategory,
+    createVariantGroup,
+    deleteVariantGroup,
+    updateVariantGroup
+}

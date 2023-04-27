@@ -1,5 +1,5 @@
-const config = require('../config')
-const nodemailer = require('nodemailer')
+import config from '../config.js'
+import nodemailer from 'nodemailer'
 
 const transport = nodemailer.createTransport({
     service: 'gmail',
@@ -9,7 +9,7 @@ const transport = nodemailer.createTransport({
     },
 })
 
-exports.sendForgotPasswordCode = (to, code) => {
+export default (to, code) => {
     const options = {
         from: config.mailer.user,
         to,

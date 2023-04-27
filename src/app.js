@@ -1,12 +1,12 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const mongoose = require('mongoose');
-const routes = require('./routes/_index');
-const cors = require('cors');
-const config = require('./config');
-const access = require('./middlewares/access.middleware')
-const helmet = require('helmet')
-const rateLimit = require('express-rate-limit')
+import mongoose from 'mongoose';
+import routes from './routes/_index.js';
+import cors from 'cors';
+import config from './config.js';
+import access from './middlewares/access.middleware.js'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -19,7 +19,7 @@ app.use(cors())
 // app.use(rateLimit(limiter))
 app.use(express.json())
 app.use(helmet())
-app.use(access)
+// app.use(access)
 
 app.use('/api', routes)
 

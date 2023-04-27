@@ -1,5 +1,5 @@
-const jsonwebtoken = require('jsonwebtoken')
-const config = require('../config')
+import jsonwebtoken from 'jsonwebtoken'
+import config from '../config.js'
 
 const operations = {}
 
@@ -25,4 +25,4 @@ operations.verify = function (token) {
 
 operations.decode = (token) => jsonwebtoken.decode(token)
 
-module.exports = operations
+export default operations

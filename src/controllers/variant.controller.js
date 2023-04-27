@@ -1,23 +1,23 @@
-const Product = require('../models/product.model');
-const Variant = require('../models/variant.model')
-const asyncMiddleware = require('../middlewares/async.middleware');
+import Product from '../models/product.model.js';
+import Variant from '../models/variant.model.js';
+import asyncMiddleware from '../middlewares/async.middleware.js';
 
 //? when product does't have any variant returns response with 404
-exports.listVariants = asyncMiddleware(async (req, res) => {
+const listVariants = asyncMiddleware(async (req, res) => {
     const variants = await Variant.find({ product: req.params.productId })
     if (!variants.length) return res.status(404).json({ message: "NOT_FOUND" })
 
     res.status(200).json(variants)
 })
 
-exports.getVariant = asyncMiddleware(async (req, res) => {
+const getVariant = asyncMiddleware(async (req, res) => {
     const variant = await Variant.findById(req.params.variantId)
     if (!variant) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
 
     res.status(200).json(variant)
 })
 
-exports.createVariant = asyncMiddleware(async (req, res) => {
+const createVariant = asyncMiddleware(async (req, res) => {
     const { productId, groupId } = req.params;
     
     const product = await Product.findOne({ _id: productId, "variantGroups._id": groupId });
@@ -48,7 +48,7 @@ exports.createVariant = asyncMiddleware(async (req, res) => {
 
 //? must be changed
 //? avoids the same name for variant in different groups
-exports.updateVariant = asyncMiddleware(async (req, res) => {
+const updateVariant = asyncMiddleware(async (req, res) => {
     const variantId = req.params.variantId
     const productId = req.params.productId
 
@@ -81,7 +81,7 @@ exports.updateVariant = asyncMiddleware(async (req, res) => {
     res.status(200).json(product)
 })
 
-exports.deleteVariant = asyncMiddleware(async (req, res) => {
+const deleteVariant = asyncMiddleware(async (req, res) => {
     const { productId, variantId } = req.params;
 
     const filter = { _id: productId, "variantGroups.variants._id": variantId }
@@ -98,3 +98,11 @@ exports.deleteVariant = asyncMiddleware(async (req, res) => {
         variant
     })
 })
+
+export default {
+    listVariants,
+    getVariant,
+    updateVariant,
+    createVariant,
+    deleteVariant
+}

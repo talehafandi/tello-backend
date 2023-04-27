@@ -1,5 +1,7 @@
-const router = require('express').Router();
-const controller = require('../controllers/category.controller');
+import { Router } from 'express';
+import controller from '../controllers/category.controller.js';
+
+const router = Router()
 
 router.get('/', controller.list);
 router.post('/', controller.create);
@@ -11,4 +13,4 @@ router.put('/:id/sub-category/:subCategoryId', controller.removeSubCategory);
 router.get('/:id/sub-categories', controller.listSubCategories);
 
 
-module.exports = router;
+export default router;
