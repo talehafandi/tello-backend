@@ -1,5 +1,6 @@
-import config from '../config.js'
+import config from '../config'
 import nodemailer from 'nodemailer'
+import { Req, Res } from '../types/express'
 
 const transport = nodemailer.createTransport({
     service: 'gmail',
@@ -9,18 +10,20 @@ const transport = nodemailer.createTransport({
     },
 })
 
-export default (to, code) => {
+export const sendForgotPasswordCode = (to: string, code: number) => {
     const options = {
         from: config.mailer.user,
         to,
         subject: 'Forgot Password',
         html: `<h1>The code is: ${code}</h1>`
     }
-    
+
     try {
-        transport.sendMail(options)
+        // transport.sendMail(options)
+        console.log(code);
+        
     } catch (error) {
         console.log(error);
-        res.status(500).json({message: 'SERVER_ERROR'})
+        return (_req: Req, res: Res) => res.status(500).json({ message: 'FAILED_TO_SEND_CODE' })
     }
 }

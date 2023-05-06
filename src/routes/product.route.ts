@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import controller from '../controllers/product.controller.js';
-import variantRoute from './variant.route.js'
+import controller from '../controllers/product.controller';
+import variantRoute from './variant.route'
 
-const router = Router()
+const router: Router = Router()
 
 router.get('/', controller.list);
 router.post('/', controller.create);

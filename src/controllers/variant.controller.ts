@@ -1,29 +1,39 @@
-import Product from '../models/product.model.js';
-import Variant from '../models/variant.model.js';
-import asyncMiddleware from '../middlewares/async.middleware.js';
+import Product from '../models/product.model';
+import Variant from '../models/variant.model';
+import asyncMiddleware from '../middlewares/async.middleware';
+import { Req, Res } from '../types/express'
 
 //? when product does't have any variant returns response with 404
-const listVariants = asyncMiddleware(async (req, res) => {
+const listVariants = asyncMiddleware(async (req: Req, res: Res) => {
     const variants = await Variant.find({ product: req.params.productId })
     if (!variants.length) return res.status(404).json({ message: "NOT_FOUND" })
 
     res.status(200).json(variants)
 })
 
-const getVariant = asyncMiddleware(async (req, res) => {
+const getVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const variant = await Variant.findById(req.params.variantId)
     if (!variant) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
 
     res.status(200).json(variant)
 })
 
-const createVariant = asyncMiddleware(async (req, res) => {
+const createVariant = asyncMiddleware(async (req: Req, res: Res) => {
+    interface Group { 
+        name: string; 
+        _id?: string, 
+        variants: { 
+            name: string; 
+            price: number; 
+            stock: number; 
+        }[]; 
+    }
     const { productId, groupId } = req.params;
-    
+
     const product = await Product.findOne({ _id: productId, "variantGroups._id": groupId });
     if (!product) return res.status(404).json({ message: "ITEM_NOT_FOUND" });
 
-    const groupIndex = product.variantGroups.findIndex((group) => group._id == groupId);
+    const groupIndex = product.variantGroups.findIndex((group: Group) => group._id == groupId);
     if (groupIndex === -1) return res.status(404).json({ message: "VARIANT_GROUP_NOT_FOUND" });
 
     // to avoid duplication, gonna find better solution
@@ -48,7 +58,7 @@ const createVariant = asyncMiddleware(async (req, res) => {
 
 //? must be changed
 //? avoids the same name for variant in different groups
-const updateVariant = asyncMiddleware(async (req, res) => {
+const updateVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const variantId = req.params.variantId
     const productId = req.params.productId
 
@@ -73,15 +83,15 @@ const updateVariant = asyncMiddleware(async (req, res) => {
         update,
         options,
     );
-    if(!product) return res.status(404).json({message: "ITEM_NOT_FOUND"}) 
+    if (!product) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
 
     const variant = await Variant.findByIdAndUpdate(variantId, req.body)
-    if (!variant) return res.status(404).json({message: "VARIANT_NOT_FOUND"}) 
+    if (!variant) return res.status(404).json({ message: "VARIANT_NOT_FOUND" })
 
     res.status(200).json(product)
 })
 
-const deleteVariant = asyncMiddleware(async (req, res) => {
+const deleteVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const { productId, variantId } = req.params;
 
     const filter = { _id: productId, "variantGroups.variants._id": variantId }

@@ -1,10 +1,9 @@
-import express from 'express';
-const app = express();
+import express, {Application } from 'express';
 import mongoose from 'mongoose';
-import routes from './routes/_index.js';
+import routes from './routes/_index';
 import cors from 'cors';
-import config from './config.js';
-import access from './middlewares/access.middleware.js'
+import config from './config';
+import access from './middlewares/access.middleware'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 
@@ -14,6 +13,8 @@ const limiter = rateLimit({
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
+
+const app: Application = express();
 
 app.use(cors())
 // app.use(rateLimit(limiter))

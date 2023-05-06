@@ -1,9 +1,14 @@
 import jsonwebtoken from 'jsonwebtoken'
-import config from '../config.js'
+import config from '../config'
+import { Types } from 'mongoose'
 
-const operations = {}
+interface User {
+    _id: Types.ObjectId,
+    firstname: string,
+    lastname: string
+}
 
-operations.sign = (user) => {
+export const sign = (user: User) => {
     // console.log("user: ", user);
     let claims = {
         id: user._id,
@@ -19,10 +24,14 @@ operations.sign = (user) => {
     )
 }
 
-operations.verify = function (token) {
+export const verify = function (token: string) {
     return jsonwebtoken.verify(token, config.jwt.sign)
 }
 
-operations.decode = (token) => jsonwebtoken.decode(token)
+export const decode = (token: string) => jsonwebtoken.decode(token)
 
-export default operations
+export default {
+    sign,
+    verify,
+    decode
+}

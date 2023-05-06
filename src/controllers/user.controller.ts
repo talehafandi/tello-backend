@@ -1,19 +1,20 @@
-import User from '../models/user.model.js'
-import asyncMiddleware from '../middlewares/async.middleware.js'
+import User from '../models/user.model'
+import asyncMiddleware from '../middlewares/async.middleware'
+import { Req, Res, Next } from '../types/express'
 
-const list = asyncMiddleware(async(req, res) => {
+const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
     const users = await User.find().select('-password')
     return res.status(201).json(users)
 })
 
-const getOne = asyncMiddleware(async(req, res) => {
+const getOne = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const user = await User.findById(req.params.id)
     if(!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
 
     return res.status(201).json(user)
 })
 
-const update = asyncMiddleware(async (req, res) => {
+const update = asyncMiddleware(async  (req: Req, res: Res): Promise<Res> => {
     const payload = req.body
     const { id } = req.params
     
@@ -24,7 +25,7 @@ const update = asyncMiddleware(async (req, res) => {
     return res.status(201).json(user)
 })  
 
-const remove = asyncMiddleware(async (req, res) => {
+const remove = asyncMiddleware(async  (req: Req, res: Res): Promise<Res> => {
     const user = await User.findById(req.params.id)
     if(!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
     if(user._id != req.user.id) return res.status(403).json({ message: 'UNAUTHORIZED_ACTION' })

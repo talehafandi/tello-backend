@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import controller from '../controllers/category.controller.js';
+import controller from '../controllers/category.controller';
 
-const router = Router()
+const router: Router = Router()
 
 router.get('/', controller.list);
 router.post('/', controller.create);

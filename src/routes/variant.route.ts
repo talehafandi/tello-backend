@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import controller from '../controllers/variant.controller.js'
+import controller from '../controllers/variant.controller'
 
-const router = Router({ mergeParams: true })
+const router: Router = Router({ mergeParams: true })
 
 router.get('/:variantId', controller.getVariant)
 router.get('/', controller.listVariants)

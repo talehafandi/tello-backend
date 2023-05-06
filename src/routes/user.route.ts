@@ -1,7 +1,7 @@
 import { Router }  from 'express'
-import controller  from '../controllers/user.controller.js'
+import controller  from '../controllers/user.controller'
 
-const router = Router()
+const router: Router = Router()
 
 router.get('/', controller.list)
 router.get('/:id', controller.getOne)

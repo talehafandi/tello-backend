@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import category from './category.route.js'
-import product from './product.route.js'
-import auth from './auth.route.js'
-import user from './user.route.js'
+import category from './category.route'
+import product from './product.route'
+import auth from './auth.route'
+import user from './user.route'
 
-const router = Router()
+const router: Router = Router()
 
 router.use('/v1/categories', category);
 router.use('/v1/products', product);

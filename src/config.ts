@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-export default {
+const config: any = {
     port: process.env.PORT || 6006,
     db: {
         uri: process.env.DB_URI,
@@ -21,3 +21,4 @@ export default {
         expire: process.env.JWT_EXPIRE
     }
 }
+export default config

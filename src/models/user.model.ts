@@ -1,7 +1,27 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema
+import { Document } from "mongoose";
 
-const User = new Schema({
+export interface IUser extends Document{
+    _id: mongoose.Types.ObjectId,
+    email: string;
+    password: string;
+    firstname: string;
+    lastname: string;
+    role: string;
+    oAuth: boolean;
+    phone?: string,
+    lastLogin: string,
+    forgotPasswordCode?: number | null,
+    address?: {
+        country?: string | undefined;
+        city?: string | undefined;
+        street?: string | undefined;
+        zipCode?: string | undefined;
+    } 
+}
+
+const User = new Schema<IUser>({
     firstname: {
         type: String,
         required: true,
