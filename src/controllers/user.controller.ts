@@ -3,7 +3,7 @@ import asyncMiddleware from '../middlewares/async.middleware'
 import { Req, Res, Next } from '../types/express'
 
 const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
-    const users = await User.find().select('-password')
+    const users = await User.find()
     return res.status(201).json(users)
 })
 

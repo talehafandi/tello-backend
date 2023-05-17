@@ -11,7 +11,6 @@ export interface IUser extends Document{
     role: string;
     oAuth: boolean;
     phone?: string,
-    lastLogin: string,
     forgotPasswordCode?: number | null,
     address?: {
         country?: string | undefined;
@@ -36,7 +35,6 @@ const User = new Schema<IUser>({
         street: { type: String },
         zipCode: { type: String }
     },
-    // sex: { type: String, enum: ['m', 'f'] },
     role: { type: String, default: 'user' },
     email: {
         type: String,
@@ -45,16 +43,14 @@ const User = new Schema<IUser>({
         lowercase: true,
         trim: true
     },
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false },
     phone: {
         type: String,
-        // unique: true
-    },
-    lastLogin:{
-        type: String
-    },    
+    },   
     forgotPasswordCode: { type: String },
-    oAuth: { type: Boolean, default: false }
+    oAuth: { type: Boolean, default: false, select: false }
 })
 
-export default mongoose.model('user', User);
+// ! Add middleware to diselect password field in find querry
+
+export default mongoose.model<IUser>('user', User);

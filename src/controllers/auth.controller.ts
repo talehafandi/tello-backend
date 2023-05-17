@@ -29,7 +29,7 @@ const signup = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
 const login = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const { email, password } = req.body
 
-    const user: IUser | null = await User.findOne({ email: email })
+    const user: IUser | null = await User.findOne({ email: email }).select('+password')
     if (!user) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
 
 
@@ -74,11 +74,11 @@ const forgotPasswordConfirm = asyncMiddleware(async (req: Req, res: Res): Promis
     return res.status(201).json({ token: jwt.sign(user) })
 
 })
-
+//?
 const changePassword = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const { oldPassword, newPassword, email } = req.body
 
-    const user: IUser | null = await User.findOne({ email: email })
+    const user: IUser | null = await User.findOne({ email: email }).select('+password')
     if (!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
 
     const isPasswordMatched = await bcyrpt.compare(oldPassword, user.password)
@@ -100,16 +100,20 @@ const client = new google.auth.OAuth2(
     config.google.redirect_url
 )
 
-// ? No need for async, but did not work w/o asyncMiddleware
-const getUrl = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
-    const url = client.generateAuthUrl({
-        access_type: 'offline',
-        // prompt: 'consent',
-        scope: ['email', 'profile'],
-    })
-
-    return res.status(201).json({ url })
-})
+const getUrl = (_req: Req, res: Res): Res => {
+    try {
+        const url = client.generateAuthUrl({
+            access_type: 'offline',
+            // prompt: 'consent',
+            scope: ['email', 'profile'],
+        })
+    
+        return res.status(201).json({ url })
+    } catch (error) {
+        console.log("getUrl  Error: ", error);
+        return res.status(201).json({ message: "FAILED_TO_GET_URL" })
+    }
+}
 
 const handleAuth = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const code: string = req.query.code as string
@@ -123,7 +127,7 @@ const handleAuth = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     }
     const decoded: Decoded = jwt.decode(tokens.id_token) as Decoded
     
-    let user: IUser | null = await User.findOne({ email: decoded.email })
+    let user: IUser | null = await User.findOne({ email: decoded.email }).select('+oAuth')
 
     if (user && !user.oAuth) return res.status(301).json({ message: 'USER_ALREADY_EXISTS' })
     if (user) return res.status(201).json({ token: jwt.sign(user) })
