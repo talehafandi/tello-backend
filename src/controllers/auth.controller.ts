@@ -32,7 +32,6 @@ const login = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const user: IUser | null = await User.findOne({ email: email }).select('+password')
     if (!user) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
 
-
     const isPasswordMatched = await bcyrpt.compare(password, user.password)
     if (!isPasswordMatched) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
 
@@ -100,20 +99,16 @@ const client = new google.auth.OAuth2(
     config.google.redirect_url
 )
 
-const getUrl = (_req: Req, res: Res): Res => {
-    try {
-        const url = client.generateAuthUrl({
-            access_type: 'offline',
-            // prompt: 'consent',
-            scope: ['email', 'profile'],
-        })
-    
-        return res.status(201).json({ url })
-    } catch (error) {
-        console.log("getUrl  Error: ", error);
-        return res.status(201).json({ message: "FAILED_TO_GET_URL" })
-    }
-}
+// TODO: Does not work w/o asyncMiddleware
+const getUrl =  asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
+    const url = client.generateAuthUrl({
+        access_type: 'offline',
+        // prompt: 'consent',
+        scope: ['email', 'profile'],
+    })
+
+    return res.status(201).json({ url })
+})
 
 const handleAuth = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const code: string = req.query.code as string
@@ -151,5 +146,5 @@ export default {
     forgotPassword,
     forgotPasswordConfirm,
     getUrl,
-    handleAuth
+    handleAuth,
 }
