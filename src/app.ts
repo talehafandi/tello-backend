@@ -6,6 +6,8 @@ import config from './config';
 import access from './middlewares/access.middleware'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
+import { RequestHandler } from 'express';
+import { ParamsDictionary, Query } from 'express-serve-static-core';
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -20,7 +22,8 @@ app.use(cors())
 // app.use(rateLimit(limiter))
 app.use(express.json())
 app.use(helmet())
-// app.use(access)
+app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
+
 
 app.use('/api', routes)
 

@@ -1,13 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
+import { ReqUser } from './types'
 
 export interface Req extends Request {
-    user: {
-        firstname: string,
-        lastname: string,
-        id: Object,
-        iat: number,
-        eat: number
-    }
+    user: ReqUser
 }
 
 export interface Res extends Response {}
