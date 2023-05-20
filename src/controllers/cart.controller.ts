@@ -2,6 +2,7 @@ import Cart from '../models/cart.model';
 import asyncMiddleware from '../middlewares/async.middleware'
 // import Err from '../error/Err'
 import { Req, Res, Next } from '../types/express'
+import { ApiError } from '../error/ApiError';
 
 
 const create = asyncMiddleware(async (req: Req, res: Res) => {
@@ -11,7 +12,7 @@ const create = asyncMiddleware(async (req: Req, res: Res) => {
 
 const getOne = asyncMiddleware(async (req: Req, res: Res, next: Next) => {
     const cart = await Cart.findById(req.params.id)
-    if (!cart) return res.status(404).json({ message: "CART_NOT_FOUND" })
+    if (!cart) throw new ApiError('CART_NOT_FOUND', 404)
 
     return res.status(201).json(cart)
 })
@@ -22,7 +23,7 @@ const updateItem = asyncMiddleware(async (req: Req, res: Res) => {
     const { qty } = req.body
 
     const cart = await Cart.findById(cartId)
-    if (!cart) return res.status(404).json({ message: "CART_NOT_FOUND" })
+    if (!cart) throw new ApiError('CART_NOT_FOUND', 404)
 
     // delete item if qty is 0
     if (qty === 0) {
@@ -43,7 +44,7 @@ const updateItem = asyncMiddleware(async (req: Req, res: Res) => {
     const item = items.find((el: any) => {
         return el.product?._id.toString() === itemId || el.variant?._id.toString() === itemId
     });
-    if (!item) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
+    if (!item) throw new ApiError('ITEM_NOT_FOUND', 404)
 
     item.qty = qty
     await cart.save()
@@ -55,7 +56,7 @@ const deleteCart = asyncMiddleware(async (req: Req, res: Res) => {
     const { id } = req.params
 
     const cart = await Cart.findByIdAndRemove(id)
-    if (!cart) return res.status(404).json({ message: "CART_NOT_FOUND" })
+    if (!cart) throw new ApiError('CART_NOT_FOUND', 404)
 
     return res.status(200).json(cart)
 })

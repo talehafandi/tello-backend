@@ -1,6 +1,7 @@
 import Model from '../models/category.model';
 import asyncMiddleware from '../middlewares/async.middleware'
 import { Req, Res, Next } from '../types/express'
+import { ApiError } from '../error/ApiError';
 
 const list = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const categories = await Model.find({ parent: null })
@@ -12,13 +13,16 @@ const getCategory = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => 
     const id = req.params.id;
     const category = await Model.findById(id)
         .populate({ path: 'subCategories', select: "_id name slug" });
-    if (!category) return res.status(404).send({ message: 'ITEM_NOT_FOUND' });
+
+    if (!category) throw new ApiError('ITEM_NOT_FOUND', 404)
+
     return res.status(200).json(category);
 })
 
 const create = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const category = await Model.create(req.body);
     if (category.parent) await Model.findByIdAndUpdate(category.parent, { $addToSet: { subCategories: category._id } });
+
     return res.status(201).json(category);
 })
 
@@ -28,7 +32,7 @@ const update = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     if (payload.subCategories) delete payload.subCategories;
 
     const category = await Model.findById(id)
-    if (!category) return res.status(404).send({ message: 'ITEM_NOT_FOUND' });
+    if (!category) throw new ApiError('ITEM_NOT_FOUND', 404)
 
     // removing item from parent subCategories
     if (payload.parent === null) await Model.findByIdAndUpdate(category.parent, { $pull: { subCategories: id } });
@@ -41,13 +45,18 @@ const update = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
 
     return res.status(200).json(category)
 })
-
+// TODO test it again
 const remove = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const id = req.params.id;
     const toDeleted = await Model.findById(id);
-    if (!toDeleted) return res.status(404).send({ message: 'ITEM_NOT_FOUND' });
-    if (toDeleted.parent) await Model.findByIdAndUpdate(toDeleted.parent, { $pull: { subCategories: id } });
-    if (toDeleted.subCategories.length) await Model.updateMany({ _id: { $in: toDeleted.subCategories } }, { $set: { parent: null } });
+
+    if (!toDeleted) throw new ApiError('ITEM_NOT_FOUND', 404)
+
+    const removeFromParent = { $pull: { subCategories: id } } // query
+    if (toDeleted.parent) await Model.findByIdAndUpdate(toDeleted.parent, removeFromParent);
+
+    const removeSubCategories = [ { _id: { $in: toDeleted.subCategories } }, { $set: { parent: null } } ] // query
+    if (toDeleted.subCategories.length) await Model.updateMany(removeSubCategories);
 
     const deletedCategory = await Model.findByIdAndRemove(id);
     return res.status(200).json(deletedCategory);
@@ -56,7 +65,7 @@ const remove = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
 const listSubCategories = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const id = req.params.id;
     const items = await Model.findById(id).populate('subCategories');
-    if (!items) return res.status(404).send({ message: 'ITEM_NOT_FOUND' });
+    if (!items) throw new ApiError('ITEM_NOT_FOUND', 404)
     return res.status(200).json(items);
 })
 
@@ -65,7 +74,10 @@ const addSubCategory = asyncMiddleware(async (req: Req, res: Res): Promise<Res> 
     const subCategory = req.body;
 
     const newCategory = await Model.create({ ...subCategory, parent: id });
-    const updatedCategory = await Model.findByIdAndUpdate(id, { $addToSet: { subCategories: newCategory._id } }, { new: true });
+    
+    const addQuery = { $addToSet: { subCategories: newCategory._id } }
+    const updatedCategory = await Model.findByIdAndUpdate(id, addQuery, { new: true });
+
     return res.status(200).json(updatedCategory);
 })
 
@@ -73,7 +85,8 @@ const removeSubCategory = asyncMiddleware(async (req: Req, res: Res): Promise<Re
     const id = req.params.id;
     const subCategoryId = req.params.subCategoryId;
 
-    const updatedCategory = await Model.findByIdAndUpdate(id, { $pull: { subCategories: subCategoryId } }, { new: true });
+    const removeQuery = { $pull: { subCategories: subCategoryId } }
+    const updatedCategory = await Model.findByIdAndUpdate(id, removeQuery, { new: true });
     await Model.findByIdAndUpdate(subCategoryId, { $set: { parent: null } });
 
     return res.status(200).json(updatedCategory);

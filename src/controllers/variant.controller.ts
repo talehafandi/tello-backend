@@ -2,18 +2,19 @@ import Product from '../models/product.model';
 import Variant from '../models/variant.model';
 import asyncMiddleware from '../middlewares/async.middleware';
 import { Req, Res } from '../types/express'
+import { ApiError } from '../error/ApiError';
 
 //? when product does't have any variant returns response with 404
 const listVariants = asyncMiddleware(async (req: Req, res: Res) => {
     const variants = await Variant.find({ product: req.params.productId })
-    if (!variants.length) return res.status(404).json({ message: "NOT_FOUND" })
+    if (!variants.length) throw new ApiError('VARIANT_NOT_FOUND', 404)
 
     res.status(200).json(variants)
 })
 
 const getVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const variant = await Variant.findById(req.params.variantId)
-    if (!variant) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
+    if (!variant) throw new ApiError('VARIANT_NOT_FOUND', 404)
 
     res.status(200).json(variant)
 })
@@ -31,14 +32,14 @@ const createVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const { productId, groupId } = req.params;
 
     const product = await Product.findOne({ _id: productId, "variantGroups._id": groupId });
-    if (!product) return res.status(404).json({ message: "ITEM_NOT_FOUND" });
+    if (!product) throw new ApiError('PRODUCT_NOT_FOUND', 404)
 
     const groupIndex = product.variantGroups.findIndex((group: Group) => group._id == groupId);
-    if (groupIndex === -1) return res.status(404).json({ message: "VARIANT_GROUP_NOT_FOUND" });
+    if (groupIndex === -1) throw new ApiError('VARIANT_GROUP_NOT_FOUND', 404)
 
     // to avoid duplication, gonna find better solution
     const isExist = await Variant.findOne({ name: req.body.name })
-    if (isExist) return res.status(400).json({ message: "VARIANT_ALREADY_EXISTS" })
+    if (isExist) throw new ApiError('VARIANT_ALREADY_EXISTS', 409)
 
     const variantPayload = { ...req.body, product: productId };
     const variant = await Variant.create(variantPayload);
@@ -57,7 +58,7 @@ const createVariant = asyncMiddleware(async (req: Req, res: Res) => {
 })
 
 //? must be changed
-//? avoids the same name for variant in different groups
+//? does not avoid the same name for variant in different groups
 const updateVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const variantId = req.params.variantId
     const productId = req.params.productId
@@ -83,10 +84,10 @@ const updateVariant = asyncMiddleware(async (req: Req, res: Res) => {
         update,
         options,
     );
-    if (!product) return res.status(404).json({ message: "ITEM_NOT_FOUND" })
+    if (!product) throw new ApiError('PRODUCT_NOT_FOUND', 404)
 
     const variant = await Variant.findByIdAndUpdate(variantId, req.body)
-    if (!variant) return res.status(404).json({ message: "VARIANT_NOT_FOUND" })
+    if (!variant) throw new ApiError('VARIANT_NOT_FOUND', 404)
 
     res.status(200).json(product)
 })
@@ -98,10 +99,10 @@ const deleteVariant = asyncMiddleware(async (req: Req, res: Res) => {
     const payload = { $pull: { "variantGroups.$.variants": { _id: variantId } } }
 
     const product = await Product.findOneAndUpdate(filter, payload, { new: true })
-    if (!product) return res.status(404).json({ message: "PRODUCT_NOT_FOUND" })
+    if (!product) throw new ApiError('PRODUCT_NOT_FOUND', 404)
 
     const variant = await Variant.findByIdAndDelete(variantId)
-    if (!variant) return res.status(404).json({ message: "VARIANT_NOT_FOUND" })
+    if (!variant) throw new ApiError('VARIANT_NOT_FOUND', 404)
 
     res.status(200).send({
         product,

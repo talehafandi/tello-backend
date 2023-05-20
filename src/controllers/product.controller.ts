@@ -1,6 +1,7 @@
 import Model from '../models/product.model';
 import asyncMiddleware from '../middlewares/async.middleware';
 import { Req, Res, Next } from '../types/express'
+import { ApiError } from '../error/ApiError';
 
 const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
     const products = await Model.find({})
@@ -10,7 +11,7 @@ const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
 
 const getItem = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const product = await Model.findById(req.params.id)
-    if (!product) return res.status(404).json({ message: 'PRODUCT_NOT_FOUND' });
+    if (!product) throw new ApiError('ITEM_NOT_FOUND', 404)
     return res.status(200).json(product);
 });
 
@@ -42,7 +43,7 @@ const createVariantGroup = asyncMiddleware(async (req: Req, res: Res): Promise<R
 
     // to avoid duplication, gonna find better solution
     const isExist = await Model.findOne({ _id: productId, 'variantGroups.name': group.name })
-    if (isExist) return res.status(400).json({ message: 'ITEM_ALREADY_EXISTS' })
+    if (isExist) throw new ApiError('ITEM_ALREADY_EXISTS', 409)
 
 
     const product = await Model.findByIdAndUpdate(productId, { $addToSet: { variantGroups: group } }, { new: true })
@@ -65,7 +66,7 @@ const updateVariantGroup = asyncMiddleware(async (req: Req, res: Res): Promise<R
 
     // to avoid duplication, gonna find better solution
     const isExist = await Model.findOne({ _id: req.params.productId, 'variantGroups.name': data.name })
-    if (isExist) return res.status(400).json({ message: 'ITEM_ALREADY_EXISTS' })
+    if (isExist) throw new ApiError('ITEM_ALREADY_EXISTS', 409)
 
     const filter = { _id: req.params.productId, "variantGroups._id": req.params.groupId }
     const payload: Record<string, any> = { $set: {} }

@@ -1,3 +1,4 @@
+import { ApiError } from './../error/ApiError';
 import User from '../models/user.model'
 import asyncMiddleware from '../middlewares/async.middleware'
 import bcyrpt from 'bcrypt'
@@ -10,11 +11,11 @@ import config from '../config'
 import { Req, Res, Next } from '../types/express'
 import { IUser } from '../models/user.model'
 
-
+//? user can be created once instead of exists
 const signup = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const { email, password } = req.body
     const exists = await User.findOne({ email: email })
-    if (exists) return res.status(400).json({ message: 'USER_ALREADY_EXISTS' })
+    if (exists) throw new ApiError('USER_ALREADY_EXISTS', 409)
 
     const salt = await bcyrpt.genSalt(12)
     const hashedPass = await bcyrpt.hash(password, salt)
@@ -30,10 +31,10 @@ const login = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const { email, password } = req.body
 
     const user: IUser | null = await User.findOne({ email: email }).select('+password')
-    if (!user) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
+    if (!user) throw new ApiError('INVALID_CREDENTIALS', 401)
 
     const isPasswordMatched = await bcyrpt.compare(password, user.password)
-    if (!isPasswordMatched) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
+    if (!isPasswordMatched) throw new ApiError('INVALID_CREDENTIALS', 401)
 
     return res.status(200).json({ token: jwt.sign(user) })
 })
@@ -43,7 +44,7 @@ const forgotPassword = asyncMiddleware(async (req: Req, res: Res): Promise<Res> 
     const { email } = req.body
 
     const user: IUser | null = await User.findOne({ email: email })
-    if (!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
+    if (!user) throw new ApiError('USER_NOT_FOUND', 404)
 
     const code = crypto.randomInt(100000, 999999)
     user.forgotPasswordCode = code
@@ -61,7 +62,7 @@ const forgotPasswordConfirm = asyncMiddleware(async (req: Req, res: Res): Promis
     const { code, newPassword } = req.body
 
     const user: IUser | null= await User.findOne({ forgotPasswordCode: code })
-    if (!user) return res.status(404).json({ message: 'INVALID_OR_EXPIRED_CODE' })
+    if (!user) throw new ApiError('INVALID_OR_EXPIRED_CODE', 400)
 
     const salt = await bcyrpt.genSalt(12)
     const hashedPass = await bcyrpt.hash(newPassword, salt)
@@ -78,10 +79,10 @@ const changePassword = asyncMiddleware(async (req: Req, res: Res): Promise<Res> 
     const { oldPassword, newPassword, email } = req.body
 
     const user: IUser | null = await User.findOne({ email: email }).select('+password')
-    if (!user) return res.status(404).json({ message: 'USER_NOT_FOUND' })
+    if (!user) throw new ApiError('USER_NOT_FOUND', 404)
 
     const isPasswordMatched = await bcyrpt.compare(oldPassword, user.password)
-    if (!isPasswordMatched) return res.status(401).json({ message: 'INVALID_CREDENTIALS' })
+    if (!isPasswordMatched) throw new ApiError('INVALID_CREDENTIALS', 401)
 
     const salt = await bcyrpt.genSalt(12)
     const hashedPass = await bcyrpt.hash(newPassword, salt)
@@ -113,7 +114,7 @@ const getUrl =  asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
 const handleAuth = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const code: string = req.query.code as string
     const { tokens } = await client.getToken(code)
-    if (!tokens.id_token) return res.status(501).json({ message: 'GOOGLE_LOGIN_FAILED' })
+    if (!tokens.id_token) throw new ApiError('GOOGLE_LOGIN_FAILED', 401)
 
     interface Decoded {
         email: string,
@@ -124,7 +125,7 @@ const handleAuth = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     
     let user: IUser | null = await User.findOne({ email: decoded.email }).select('+oAuth')
 
-    if (user && !user.oAuth) return res.status(301).json({ message: 'USER_ALREADY_EXISTS' })
+    if (user && !user.oAuth) throw new ApiError('USER_ALREADY_EXISTS', 409)
     if (user) return res.status(201).json({ token: jwt.sign(user) })
 
     user = await User.create({
