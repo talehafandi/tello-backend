@@ -1,4 +1,4 @@
-import express, {Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import routes from './routes/_index';
 import cors from 'cors';
@@ -8,6 +8,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { RequestHandler } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
+import handleError from './error/handleError';
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
@@ -31,6 +32,8 @@ app.use((_, res, next) => {
     res.status(404).send({ message: 'PAGE_NOT_FOUND' })
     next()
 })
+
+app.use(handleError);
 
 const PORT = config.port || 6006;
 const DB = config.db.uri.replace("<password>", config.db.pass)
