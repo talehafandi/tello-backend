@@ -52,11 +52,13 @@ const remove = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
 
     if (!toDeleted) throw new ApiError('ITEM_NOT_FOUND', 404)
 
-    const removeFromParent = { $pull: { subCategories: id } } // query
+    const removeFromParent = { $pull: { subCategories: id } }
     if (toDeleted.parent) await Model.findByIdAndUpdate(toDeleted.parent, removeFromParent);
 
-    const removeSubCategories = [ { _id: { $in: toDeleted.subCategories } }, { $set: { parent: null } } ] // query
-    if (toDeleted.subCategories.length) await Model.updateMany(removeSubCategories);
+    if (toDeleted.subCategories.length) await Model.updateMany(
+        { _id: { $in: toDeleted.subCategories } },
+        { $set: { parent: null } }
+    );
 
     const deletedCategory = await Model.findByIdAndRemove(id);
     return res.status(200).json(deletedCategory);
@@ -74,7 +76,7 @@ const addSubCategory = asyncMiddleware(async (req: Req, res: Res): Promise<Res> 
     const subCategory = req.body;
 
     const newCategory = await Model.create({ ...subCategory, parent: id });
-    
+
     const addQuery = { $addToSet: { subCategories: newCategory._id } }
     const updatedCategory = await Model.findByIdAndUpdate(id, addQuery, { new: true });
 
