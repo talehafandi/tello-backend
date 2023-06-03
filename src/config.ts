@@ -1,8 +1,12 @@
 import dotenv from 'dotenv'
 dotenv.config()
+console.log("env: ", process.env.NODE_ENV);
 
 const config: any = {
     port: process.env.PORT || 6006,
+    environment: process.env.NODE_ENV,
+    server_url: process.env.SERVER_URL,
+    stripe_key: process.env.STRIPE_SECRET_KEY,
     db: {
         uri: process.env.DB_URI,
         pass: process.env.DB_PASS,

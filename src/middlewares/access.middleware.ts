@@ -13,6 +13,7 @@ const bypass = [
     '/api/v1/auth/google',
     '/api/v1/auth/forgot-password',
     '/api/v1/auth/forgot-password/confirm',
+    '/api/v1/checkout'
 ]
 
 const access = asyncMiddleware(async (req: Req, res: Response, next: NextFunction) => {

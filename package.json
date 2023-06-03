@@ -23,7 +23,8 @@
     "joi": "^17.8.3",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.2",
-    "nodemailer": "^6.9.1"
+    "nodemailer": "^6.9.1",
+    "stripe": "^12.8.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
