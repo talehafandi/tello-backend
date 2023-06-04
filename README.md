@@ -12,6 +12,7 @@ Tello Backend is a RESTful API built using Node.js, Express.js, MongoDB, and Typ
 - **Nodemailer**: A module for Node.js that enables sending emails using various transport methods.
 - **JWT (JSON Web Tokens)**: A compact and self-contained way of securely transmitting information between parties as a JSON object.
 - **OAuth2.0**: An industry-standard authorization framework used to secure and authenticate users, allowing third-party applications to access their data.
+- **Stripe**: A suite of APIs powering online payment processing and commerce solutions for internet businesses of all sizes. Accept payments and scale faster.
 
 ## Services
 
@@ -81,6 +82,7 @@ The server will start running on `http://localhost:6006`.
 - [Nodemailer](https://nodemailer.com)
 - [JWT](https://jwt.io)
 - [OAuth2.0](https://oauth.net/2/)
+- [Stripe](https://stripe.com/en-gb-us)
 
 ## Contact
 
