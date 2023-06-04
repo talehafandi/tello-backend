@@ -48,15 +48,15 @@ const update = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
 // TODO test it again
 const remove = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const id = req.params.id;
-    const toDeleted = await Model.findById(id);
+    const item = await Model.findById(id);
 
-    if (!toDeleted) throw new ApiError('ITEM_NOT_FOUND', 404)
+    if (!item) throw new ApiError('ITEM_NOT_FOUND', 404)
 
     const removeFromParent = { $pull: { subCategories: id } }
-    if (toDeleted.parent) await Model.findByIdAndUpdate(toDeleted.parent, removeFromParent);
+    if (item.parent) await Model.findByIdAndUpdate(item.parent, removeFromParent);
 
-    if (toDeleted.subCategories.length) await Model.updateMany(
-        { _id: { $in: toDeleted.subCategories } },
+    if (item.subCategories.length) await Model.updateMany(
+        { _id: { $in: item.subCategories } },
         { $set: { parent: null } }
     );
 
