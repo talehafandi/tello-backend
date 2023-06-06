@@ -13,7 +13,7 @@ export interface ICart extends Document{
     }[],
 }
 
-const Cart = new Schema({
+const Cart = new Schema<ICart>({
     products: [{
         product: {
             type: Schema.Types.ObjectId,
@@ -60,4 +60,4 @@ Cart.pre(/^find/, function (next) {
     next();
 });
 
-export default mongoose.model('cart', Cart)
+export default mongoose.model<ICart>('cart', Cart)

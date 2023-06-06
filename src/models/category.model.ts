@@ -1,7 +1,17 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const Category = new Schema({
+interface ICategory extends Document {
+    name: string;
+    description?: string;
+    slug: string;
+    parent: mongoose.Types.ObjectId | null;
+    subCategories: mongoose.Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const Category = new Schema<ICategory>({
     name: {
         type: String,
         required: true,
@@ -33,4 +43,4 @@ const Category = new Schema({
     timestamps: true
 });
 
-export default mongoose.model('category', Category);
+export default mongoose.model<ICategory>('category', Category);

@@ -1,7 +1,37 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const Product = new Schema({
+interface IProductVariant {
+    name: string;
+    price: number;
+    stock: number;
+  }
+  
+  interface IProductCategory {
+    _id: mongoose.Types.ObjectId;
+  }
+  
+  interface IProduct extends Document {
+    name: string;
+    description?: string;
+    slug: string;
+    active: boolean;
+    price: number;
+    variantGroups: Array<{
+      name: string;
+      variants: IProductVariant[];
+    }>;
+    categories: IProductCategory[];
+    sku: string;
+    stock: number;
+    sold: number;
+    rating: number;
+    sortOrder: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+const Product = new Schema<IProduct>({
     name: {
         type: String,
         required: true,
@@ -78,4 +108,4 @@ const Product = new Schema({
 }, { timestamps: true });
 
 
-export default mongoose.model('product', Product);
+export default mongoose.model<IProduct>('product', Product);

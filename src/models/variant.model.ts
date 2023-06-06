@@ -1,7 +1,19 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const Variant = new Schema({
+interface IVariant extends Document {
+    name: string;
+    product: mongoose.Types.ObjectId;
+    description?: string;
+    active: boolean;
+    price: number;
+    sku: string;
+    stock: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+const Variant = new Schema<IVariant>({
     name: {
         type: String,
         required: true,
@@ -40,4 +52,4 @@ const Variant = new Schema({
     // }],
 });
 
-export default mongoose.model('variant', Variant);
+export default mongoose.model<IVariant>('variant', Variant);
