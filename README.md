@@ -42,6 +42,10 @@ The Cart service manages shopping carts. It allows users to add products to thei
 
 The Category service handles the management of product categories. It enables creating new categories, updating existing categories, retrieving category information, and deleting categories. Categories are used to organize products into logical groups, making it easier for users to browse and search for products.
 
+### 7. Checkout Service
+
+Checkout Service handles purchace operations for items.
+
 ## Getting Started
 
 To set up the Tello Ecommerce Backend, follow these steps:
