@@ -45,3 +45,4 @@ mongoose.connect(DB, (err) => {
     app.listen(PORT, () => console.log("Server is running on PORT: ", PORT))
 })
 
+export default app
