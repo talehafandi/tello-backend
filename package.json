@@ -8,6 +8,7 @@
     "start": "npm run build && node dist/js/index.js",
     "dev": "SET NODE_ENV=development && ts-node-dev src/index.ts",
     "prod": "ts-node-dev src/index.ts",
+    "deploy": "npm run build && vercel --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
