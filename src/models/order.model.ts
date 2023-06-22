@@ -9,26 +9,30 @@ enum Role {
 }
 
 interface IOrder extends Document {
-    customer: mongoose.Types.ObjectId | null,
+    customer: string,
     total: number,
+    currency: string,
     payment: Role,
-    products: [{
+    customerDetails: object,
+    items: {
         name: string,
         price: number,
         currency: 'usd',
         qty: number
-    }],
+    }[],
 }
 
 const Order = new Schema<IOrder>({
-    customer: mongoose.Types.ObjectId,
+    customer: String,
     total: Number,
+    currency: String,
     payment: {
         type: String,
         enum: Role,
         default: Role.CARD
     },
-    products: [{
+    customerDetails: Object,
+    items: [{
         name: String,
         price: Number,
         currency: { type: String, default: 'usd' },

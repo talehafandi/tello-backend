@@ -6,7 +6,10 @@ const config: any = {
     port: process.env.PORT || 6006,
     environment: process.env.NODE_ENV,
     server_url: process.env.SERVER_URL,
-    stripe_key: process.env.STRIPE_SECRET_KEY,
+    stripe: {
+        secret: process.env.STRIPE_SECRET_KEY,
+        webhook_secret: process.env.STRIPE_WEBHOOK_SECRET
+    },
     db: {
         uri: process.env.DB_URI,
         pass: process.env.DB_PASS,
