@@ -31,7 +31,7 @@ const access = asyncMiddleware(async (req: Req, res: Response, next: NextFunctio
     } catch (e: any) {
         let message = 'INVALID_TOKEN'
         if (e.message == 'jwt expired') message = 'TOKEN_EXPIRED'
-        return res.status(403).send({ message })
+        return res.status(401).send({ message })
     }
 })
 
