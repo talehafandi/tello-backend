@@ -4,7 +4,7 @@ import asyncMiddleware from '../middlewares/async.middleware'
 import bcyrpt from 'bcrypt'
 import jwt from '../utils/jwt'
 // import mailer from '../utils/mailer.js'
-const mailer = require('../utils/mailer')
+import * as mailer from '../utils/mailer'
 import crypto from 'crypto'
 import { google } from 'googleapis'
 import config from '../config'
@@ -77,9 +77,10 @@ const forgotPasswordConfirm = asyncMiddleware(async (req: Req, res: Res): Promis
 //?
 const changePassword = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const { oldPassword, newPassword, email } = req.body
-
+    
     const user: IUser | null = await User.findOne({ email: email }).select('+password')
     if (!user) throw new ApiError('USER_NOT_FOUND', 404)
+    if (user._id != req.user.id) throw new ApiError('FORBIDDED', 403)
 
     const isPasswordMatched = await bcyrpt.compare(oldPassword, user.password)
     if (!isPasswordMatched) throw new ApiError('INVALID_CREDENTIALS', 401)

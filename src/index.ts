@@ -23,7 +23,7 @@ const app: Application = express();
 app.use(cors())
 // app.use(rateLimit(limiter))
 app.use(helmet())
-app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
+// app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
 
 // webhook payload must be sent raw
 app.use("/api/v1/checkout/webhook", bodyParser.raw({ type: '*/*' }));

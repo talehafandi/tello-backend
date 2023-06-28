@@ -5,6 +5,5 @@ const router: Router = Router()
 
 router.get('/:orderId', controller.getOne)
 router.get('/', controller.list)
-// router.post('/', controller.createOrder)
 
 export default router
