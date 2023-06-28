@@ -44,7 +44,10 @@ The Category service handles the management of product categories. It enables cr
 
 ### 7. Checkout Service
 
-Checkout Service handles purchace operations for items.
+The Checkout service handles the process of finalizing a purchase in the application. It provides functionality to create and manage orders for customers. Customers can add items to their cart, proceed to checkout, and complete the purchase.
+
+### 8. Order Service
+The Order service focuses on managing orders within the application. It provides functionalities to view, update, and track orders, catering to both customers and administrators.
 
 ## Getting Started
 
