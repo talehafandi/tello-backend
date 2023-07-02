@@ -10,6 +10,11 @@ const config: any = {
         secret: process.env.STRIPE_SECRET_KEY,
         webhook_secret: process.env.STRIPE_WEBHOOK_SECRET
     },
+    cloudinary: {
+        name: process.env.CLOUDINARY_CLOUD_NAME,
+        key: process.env.CLOUDINARY_API_KEY,
+        secret: process.env.CLOUDINARY_API_SECRET
+    },
     db: {
         uri: process.env.DB_URI,
         pass: process.env.DB_PASS,
