@@ -5,7 +5,6 @@ import { ApiError } from '../error/ApiError';
 
 const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
     const products = await Model.find({})
-    // .populate({ path: 'category', select: "_id name slug" });
     return res.status(200).json(products);
 });
 
@@ -15,6 +14,7 @@ const getItem = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     return res.status(200).json(product);
 });
 
+//? there is no limit for assets of product
 const create = asyncMiddleware(async (req: Req, res: Res): Promise<Res> => {
     const product = await Model.create(req.body);
     return res.status(201).json(product);

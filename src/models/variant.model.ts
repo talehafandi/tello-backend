@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
+interface IAsset {
+    _id: mongoose.Types.ObjectId;
+}
+
 interface IVariant extends Document {
     name: string;
     product: mongoose.Types.ObjectId;
@@ -9,6 +13,8 @@ interface IVariant extends Document {
     price: number;
     sku: string;
     stock: number;
+    cover: IAsset;
+    assets: IAsset[]
     createdAt: Date;
     updatedAt: Date;
   }
@@ -46,10 +52,22 @@ const Variant = new Schema<IVariant>({
         type: Number,
         required: true,
     },
-    // images: [{
-    //     type: String,
-    //     required: true,
-    // }],
+    cover: {
+        type: Schema.Types.ObjectId,
+        ref: 'asset',
+        // required: true,
+    },
+    assets: [{
+        type: Schema.Types.ObjectId,
+        ref: 'asset',
+        // required: true,
+    }],
+});
+
+Variant.pre(/^find/, function (next) {
+    this.find()
+    .populate({ path: 'assets cover', select: "url" });
+    next();
 });
 
 export default mongoose.model<IVariant>('variant', Variant);

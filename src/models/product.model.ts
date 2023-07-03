@@ -5,23 +5,29 @@ interface IProductVariant {
     name: string;
     price: number;
     stock: number;
-  }
-  
-  interface IProductCategory {
+}
+
+interface IProductCategory {
     _id: mongoose.Types.ObjectId;
-  }
-  
-  interface IProduct extends Document {
+}
+
+export interface IAsset {
+    _id: mongoose.Types.ObjectId;
+}
+
+interface IProduct extends Document {
     name: string;
     description?: string;
     slug: string;
     active: boolean;
     price: number;
     variantGroups: Array<{
-      name: string;
-      variants: IProductVariant[];
+        name: string;
+        variants: IProductVariant[];
     }>;
     categories: IProductCategory[];
+    cover: IAsset
+    assets: IAsset[];
     sku: string;
     stock: number;
     sold: number;
@@ -29,7 +35,7 @@ interface IProductVariant {
     sortOrder: number;
     createdAt: Date;
     updatedAt: Date;
-  }
+}
 
 const Product = new Schema<IProduct>({
     name: {
@@ -62,7 +68,7 @@ const Product = new Schema<IProduct>({
             required: true,
             trim: true,
         },
-        
+
         variants: [{
             name: { type: String, required: true },
             price: { type: Number, required: true },
@@ -74,10 +80,16 @@ const Product = new Schema<IProduct>({
         ref: 'category',
         required: true,
     }],
-    // images: [{
-    //     type: String,
-    //     required: true,
-    // }],
+    cover: {
+        type: Schema.Types.ObjectId,
+        ref: 'asset',
+        // required: true,
+    },
+    assets: [{
+        type: Schema.Types.ObjectId,
+        ref: 'asset',
+        // required: true,
+    }],
     sku: {
         type: String,
         required: true,
@@ -107,5 +119,10 @@ const Product = new Schema<IProduct>({
     },
 }, { timestamps: true });
 
+Product.pre(/^find/, function (next) {
+    this.find()
+    .populate({ path: 'assets cover', select: "url" });
+    next();
+});
 
 export default mongoose.model<IProduct>('product', Product);
