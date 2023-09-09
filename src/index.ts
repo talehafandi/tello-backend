@@ -5,7 +5,7 @@ import cors from 'cors';
 import config from './config';
 import access from './middlewares/access.middleware'
 import helmet from 'helmet'
-import rateLimit from 'express-rate-limit'
+import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit'
 import { RequestHandler } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 import handleError from './error/handleError';
@@ -21,7 +21,7 @@ const limiter = rateLimit({
 const app: Application = express();
 
 app.use(cors())
-// app.use(rateLimit(limiter))
+app.use(limiter)
 app.use(helmet())
 // app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
 
